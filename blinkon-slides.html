@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feel the Web — Haptics API</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #fff;
+    color: #1a1a1a;
+    overflow: hidden;
+  }
+
+  .slide {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    padding: 56px 80px;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: auto;
+  }
+
+  .slide.active { display: flex; }
+
+  /* Title slides */
+  .slide.title-slide {
+    align-items: center;
+    text-align: center;
+  }
+
+  .slide.title-slide h1 {
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 24px;
+  }
+
+  .slide.compact {
+    padding: 40px 64px;
+    justify-content: flex-start;
+  }
+
+  .slide.title-slide .subtitle {
+    font-size: 24px;
+    color: #555;
+    font-weight: 400;
+    margin-bottom: 12px;
+  }
+
+  .slide.title-slide .meta {
+    font-size: 18px;
+    color: #888;
+    font-weight: 400;
+  }
+
+  /* Section transition slides */
+  .slide.section-slide {
+    align-items: center;
+    text-align: center;
+  }
+
+  .slide.section-slide h2 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .slide.section-slide p {
+    font-size: 24px;
+    color: #555;
+    max-width: 700px;
+    line-height: 1.5;
+  }
+
+  /* Content slides */
+  h2 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 36px;
+    letter-spacing: -0.5px;
+  }
+
+  h3 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    margin-top: 24px;
+  }
+
+  ul, ol {
+    padding-left: 28px;
+    margin-bottom: 16px;
+  }
+
+  li {
+    font-size: 22px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+    color: #333;
+  }
+
+  p {
+    font-size: 22px;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 16px;
+  }
+
+  code {
+    font-family: 'Cascadia Code', 'Consolas', 'Fira Code', monospace;
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  pre {
+    background: #f7f7f7;
+    border-left: 3px solid #0078d4;
+    padding: 24px 28px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: 19px;
+    line-height: 1.5;
+    color: #1a1a1a;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 2px solid #1a1a1a;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .diagram {
+    background: #f7f7f7;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 32px;
+    text-align: center;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 18px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+
+  .highlight-box {
+    background: #f0f6ff;
+    border-left: 3px solid #0078d4;
+    padding: 20px 24px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+
+  .highlight-box p {
+    margin-bottom: 0;
+  }
+
+  .slide-number {
+    position: fixed;
+    bottom: 24px;
+    right: 36px;
+    font-size: 14px;
+    color: #bbb;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .label {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #0078d4;
+    margin-bottom: 12px;
+  }
+
+  blockquote {
+    font-size: 28px;
+    font-style: italic;
+    color: #444;
+    border-left: 3px solid #ccc;
+    padding-left: 24px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .dim { color: #999; }
+  .bold { font-weight: 600; color: #1a1a1a; }
+  .blue { color: #0078d4; }
+
+  .comparison-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 20px;
+  }
+
+  .comparison-box {
+    background: #f7f7f7;
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  .comparison-box.bad {
+    border-top: 3px solid #d13438;
+  }
+
+  .comparison-box.good {
+    border-top: 3px solid #107c10;
+  }
+
+  .comparison-box h3 {
+    margin-top: 0;
+    font-size: 18px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 14px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  .tag.proposed { background: #e6f2ff; color: #0078d4; }
+  .tag.alt { background: #f0f0f0; color: #666; }
+
+  .q-slide h2 {
+    font-size: 32px;
+    margin-bottom: 28px;
+  }
+
+  .flex-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .model-grid pre {
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-left-width: 2px;
+  }
+  .model-grid pre code {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .model-grid li {
+    font-size: 14px;
+    line-height: 1.45;
+    margin-bottom: 3px;
+  }
+  .model-grid code {
+    font-size: 13px;
+  }
+  .model-grid h3 {
+    font-size: 15px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .model-grid ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Slide 1: Title -->
+<div class="slide title-slide active">
+  <h1>Feel the Web</h1>
+  <div class="subtitle">A Haptics API for the Web Platform</div>
+  <div class="meta">Limin Zhu · Microsoft Edge</div>
+  <div class="meta">BlinkOn 21 · April 2026</div>
+</div>
+
+<!-- Slide 2: Audience poll -->
+<div class="slide section-slide">
+  <h2>Quick show of hands</h2>
+  <p style="font-size: 32px;">How many of you noticed haptic feedback<br>on your phone today?</p>
+</div>
+
+<!-- Slide 3: Examples they might have felt -->
+<div class="slide">
+  <h2>You probably felt some of these recently</h2>
+  <div style="display: flex; gap: 72px; justify-content: center; align-items: start; margin-top: 32px;">
+    <div style="text-align: center;">
+      <svg width="170" height="250" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Phone body -->
+        <rect x="30" y="10" width="140" height="260" rx="20" stroke="#1a1a1a" stroke-width="3" fill="#fff"/>
+        <rect x="42" y="40" width="116" height="200" rx="4" fill="#f7f7f7"/>
+        <rect x="75" y="18" width="50" height="6" rx="3" fill="#e0e0e0"/>
+        <!-- Pull to refresh arrow -->
+        <line x1="100" y1="80" x2="100" y2="160" stroke="#0078d4" stroke-width="3" stroke-linecap="round"/>
+        <polyline points="82,140 100,160 118,140" stroke="#0078d4" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 85 100 A 20 20 0 1 1 100 80" stroke="#0078d4" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <polyline points="100,74 100,82 108,78" stroke="#0078d4" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Haptic waves -->
+        <path d="M 22 130 Q 14 140 22 150" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 16 124 Q 4 140 16 156" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 178 130 Q 186 140 178 150" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 184 124 Q 196 140 184 156" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <p style="font-size: 20px; margin-top: 12px;">Pull down to refresh</p>
+    </div>
+    <div style="text-align: center;">
+      <svg width="170" height="250" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Phone body -->
+        <rect x="30" y="10" width="140" height="260" rx="20" stroke="#1a1a1a" stroke-width="3" fill="#fff"/>
+        <rect x="42" y="40" width="116" height="200" rx="4" fill="#f7f7f7"/>
+        <rect x="75" y="18" width="50" height="6" rx="3" fill="#e0e0e0"/>
+        <!-- Toggle switch (on state) -->
+        <rect x="72" y="122" width="56" height="32" rx="16" fill="#34c759"/>
+        <circle cx="112" cy="138" r="13" fill="#fff"/>
+        <!-- Label -->
+        <text x="100" y="110" font-family="Segoe UI, sans-serif" font-size="13" fill="#888" text-anchor="middle">Wi-Fi</text>
+        <text x="100" y="175" font-family="Segoe UI, sans-serif" font-size="11" fill="#34c759" text-anchor="middle">ON</text>
+        <!-- Haptic waves -->
+        <path d="M 22 130 Q 14 140 22 150" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 16 124 Q 4 140 16 156" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 178 130 Q 186 140 178 150" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 184 124 Q 196 140 184 156" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <p style="font-size: 20px; margin-top: 12px;">Toggle a switch</p>
+    </div>
+    <div style="text-align: center;">
+      <svg width="170" height="250" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Phone body -->
+        <rect x="30" y="10" width="140" height="260" rx="20" stroke="#1a1a1a" stroke-width="3" fill="#fff"/>
+        <rect x="42" y="40" width="116" height="200" rx="4" fill="#f7f7f7"/>
+        <rect x="75" y="18" width="50" height="6" rx="3" fill="#e0e0e0"/>
+        <!-- Time picker -->
+        <text x="68" y="118" font-family="Segoe UI, sans-serif" font-size="14" fill="#ccc" text-anchor="middle">5</text>
+        <text x="68" y="143" font-family="Segoe UI, sans-serif" font-size="18" font-weight="600" fill="#1a1a1a" text-anchor="middle">6</text>
+        <text x="68" y="168" font-family="Segoe UI, sans-serif" font-size="14" fill="#ccc" text-anchor="middle">7</text>
+        <text x="100" y="143" font-family="Segoe UI, sans-serif" font-size="18" font-weight="600" fill="#1a1a1a" text-anchor="middle">:</text>
+        <text x="128" y="118" font-family="Segoe UI, sans-serif" font-size="14" fill="#ccc" text-anchor="middle">29</text>
+        <text x="128" y="143" font-family="Segoe UI, sans-serif" font-size="18" font-weight="600" fill="#1a1a1a" text-anchor="middle">30</text>
+        <text x="128" y="168" font-family="Segoe UI, sans-serif" font-size="14" fill="#ccc" text-anchor="middle">31</text>
+        <rect x="48" y="128" width="104" height="24" rx="4" fill="#0078d4" opacity="0.08"/>
+        <line x1="48" y1="128" x2="152" y2="128" stroke="#e0e0e0" stroke-width="1"/>
+        <line x1="48" y1="152" x2="152" y2="152" stroke="#e0e0e0" stroke-width="1"/>
+        <text x="155" y="143" font-family="Segoe UI, sans-serif" font-size="10" fill="#0078d4"> AM</text>
+        <!-- Haptic waves -->
+        <path d="M 22 130 Q 14 140 22 150" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 16 124 Q 4 140 16 156" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 178 130 Q 186 140 178 150" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 184 124 Q 196 140 184 156" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <p style="font-size: 20px; margin-top: 12px;">Set an alarm</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 4: What if it's gone -->
+<div class="slide section-slide">
+  <h2>Now imagine it's gone</h2>
+  <p>Every tap feels flat. Toggles give no confirmation.<br>
+     Scrolling through a picker feels like dragging a div.</p>
+  <br>
+  <p>That tactile layer is invisible until it's missing.<br>
+     <span class="bold">The web barely has any of this.</span></p>
+</div>
+
+<!-- Slide 3: Now try the web -->
+<div class="slide">
+  <h2>What about the web?</h2>
+  <p>These same interactions on the web? Very likely no haptics.</p>
+  <p>The only tool available today:</p>
+  <pre><code>navigator.vibrate([200, 100, 200]);</code></pre>
+  <ul>
+    <li>Mobile-only — no Safari/WebKit support</li>
+    <li>Raw duration/pattern arrays — no semantic intent</li>
+    <li>No declarative path — always requires JS</li>
+    <li>Developers hand-tune millisecond values per device</li>
+  </ul>
+</div>
+
+<!-- Slide: The checkbox hack -->
+<div class="slide">
+  <h2>Developers are already hacking around this</h2>
+  <div style="display: flex; gap: 56px; align-items: center; justify-content: center; margin-top: 24px;">
+    <div style="flex: 0 0 480px;">
+      <img src="tweet-firt-haptics.png" alt="Tweet by @firt about web-haptics library using invisible switch inputs for haptics on iOS Safari" style="width: 100%; border-radius: 12px; border: 1px solid #e0e0e0;">
+    </div>
+    <div style="flex: 0 1 400px;">
+      <ul>
+        <li>Safari never implemented <code>navigator.vibrate()</code></li>
+        <li>But Safari's <code>&lt;input switch&gt;</code> fires a system haptic on toggle</li>
+        <li>So… check/uncheck invisible switches to get haptics</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 5: Goals & Non-goals -->
+<div class="slide">
+  <h2>Goals &amp; Non-goals</h2>
+  <div class="two-col">
+    <div>
+      <h3>Goals</h3>
+      <ul>
+        <li>Semantic effects — signal <span class="bold">intent</span>, not raw patterns</li>
+        <li>Cross-platform — desktop &amp; mobile</li>
+        <li>Declarative (CSS) + imperative (JS)</li>
+        <li>Progressive enhancement</li>
+        <li>Minimal fingerprinting surface</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Non-goals</h3>
+      <ul>
+        <li>Identical output across platforms</li>
+        <li>Notification haptics (e.g. alert on task complete)</li>
+        <li>Gamepad / specialized hardware</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 6: The API at a glance -->
+<div class="slide">
+  <h2>The API at a glance</h2>
+  <p>Four semantic effects — <code>hint</code> · <code>edge</code> · <code>tick</code> · <code>align</code> — with optional intensity (0.0–1.0).</p>
+  <div class="comparison-row" style="margin-top: 28px;">
+    <div class="comparison-box">
+      <h3>Declarative (CSS)</h3>
+      <pre><code>@haptic-trigger button:active {
+  effect: align;
+  intensity: 0.8;
+}</code></pre>
+      <p style="font-size: 18px; color: #555;">Fires when a selector starts matching.<br>No JavaScript needed.</p>
+    </div>
+    <div class="comparison-box">
+      <h3>Imperative (JS)</h3>
+      <pre><code>navigator.playHaptics('align', 0.8);</code></pre>
+      <p style="font-size: 18px; color: #555;">For interactions that need runtime logic.<br>Requires sticky user activation.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 7: Effect vocabulary -->
+<div class="slide">
+  <h2>Effect vocabulary</h2>
+  <table>
+    <tr><th>Effect</th><th>Description</th><th>When to use</th></tr>
+    <tr>
+      <td><code>hint</code></td>
+      <td>Light, subtle cue</td>
+      <td>Focusing an input, entering a drop zone</td>
+    </tr>
+    <tr>
+      <td><code>edge</code></td>
+      <td>Heavy boundary signal</td>
+      <td>Validation failure, scroll hitting boundary</td>
+    </tr>
+    <tr>
+      <td><code>tick</code></td>
+      <td>Firm discrete pulse</td>
+      <td>Scroll-snap landing, toggling a switch</td>
+    </tr>
+    <tr>
+      <td><code>align</code></td>
+      <td>Crisp lock-into-place</td>
+      <td>Drag-to-snap, window snap, zoom to 100%</td>
+    </tr>
+  </table>
+  <p><code>intensity</code>: normalized 0.0–1.0 · effective = system setting × developer value</p>
+</div>
+
+<!-- Slide 9: Imperative API -->
+<div class="slide">
+  <h2>Imperative API (JS)</h2>
+  <pre><code>navigator.playHaptics(effect, intensity);</code></pre>
+  <ul>
+    <li><code>effect</code>: <code>"hint"</code> | <code>"edge"</code> | <code>"tick"</code> | <code>"align"</code></li>
+    <li><code>intensity</code> (optional): 0.0–1.0, defaults to 1.0</li>
+    <li>Requires <span class="bold">sticky user activation</span> — no permission prompt</li>
+    <li>Always returns <code>undefined</code> — no device info leakage</li>
+  </ul>
+  <br>
+  <p>Feature detection:</p>
+  <pre><code>if ('playHaptics' in navigator) { … }</code></pre>
+</div>
+
+<!-- Slide 10: Declarative API -->
+<div class="slide">
+  <h2>Declarative API (CSS)</h2>
+  <pre><code>@haptic-trigger &lt;selector&gt; {
+  effect: &lt;effect-name&gt;;
+  intensity: &lt;number&gt;;       /* optional, defaults to 1.0 */
+}</code></pre>
+  <ul>
+    <li>Fires <span class="bold">once</span> when selector <span class="bold">starts matching</span></li>
+    <li>Works with pseudo-classes (<code>:active</code>, <code>:checked</code>, <code>:snapped</code>), classes (<code>.is-open</code>), attributes (<code>[aria-invalid]</code>)</li>
+    <li>UAs may coalesce or suppress triggers to avoid overload</li>
+    <li>Progressive enhancement — browsers silently ignore unknown at-rules</li>
+  </ul>
+</div>
+
+<!-- Slide 11: Scenario — Add to Cart -->
+<div class="slide">
+  <span class="label">Scenario</span>
+  <h2>E-Commerce "Add to Cart"</h2>
+  <div style="display: flex; gap: 48px; align-items: center;">
+    <div style="flex: 1;">
+      <p>Tactile confirmation on button press — zero JavaScript:</p>
+      <pre><code>@haptic-trigger .add-to-cart:active {
+  effect: align;
+  intensity: 0.8;
+}</code></pre>
+    </div>
+    <div style="flex: 0 0 340px; text-align: center;">
+      <svg width="340" height="240" viewBox="0 0 280 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Phone -->
+        <rect x="70" y="5" width="140" height="190" rx="18" stroke="#1a1a1a" stroke-width="2.5" fill="#fff"/>
+        <rect x="80" y="30" width="120" height="140" rx="3" fill="#f7f7f7"/>
+        <rect x="120" y="12" width="40" height="5" rx="2.5" fill="#e0e0e0"/>
+        <!-- Product box -->
+        <rect x="105" y="45" width="70" height="50" rx="4" fill="#e8e8e8" stroke="#ccc" stroke-width="1"/>
+        <rect x="120" y="55" width="40" height="8" rx="2" fill="#ccc"/>
+        <rect x="125" y="68" width="30" height="5" rx="2" fill="#ddd"/>
+        <!-- Add to Cart button -->
+        <rect x="100" y="108" width="80" height="30" rx="6" fill="#0078d4"/>
+        <text x="140" y="128" font-family="Segoe UI, sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="600">Add to Cart</text>
+        <!-- Finger tap -->
+        <ellipse cx="140" cy="140" rx="14" ry="10" fill="#1a1a1a" opacity="0.08"/>
+        <!-- Haptic waves -->
+        <path d="M 62 110 Q 54 123 62 136" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 56 104 Q 44 123 56 142" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 218 110 Q 226 123 218 136" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 224 104 Q 236 123 224 142" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 12: Scenario — Scroll snap -->
+<div class="slide">
+  <span class="label">Scenario</span>
+  <h2>Scroll-snap story carousel</h2>
+  <div style="display: flex; gap: 48px; align-items: center;">
+    <div style="flex: 1;">
+      <p>A tick on each snap landing using <code>:snapped</code> from CSS Scroll Snap 2:</p>
+      <pre><code>@haptic-trigger .story-carousel > .story:snapped {
+  effect: tick;
+  intensity: 0.5;
+}</code></pre>
+    </div>
+    <div style="flex: 0 0 340px; text-align: center;">
+      <svg width="340" height="240" viewBox="0 0 280 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Phone -->
+        <rect x="70" y="5" width="140" height="190" rx="18" stroke="#1a1a1a" stroke-width="2.5" fill="#fff"/>
+        <rect x="80" y="30" width="120" height="140" rx="3" fill="#f7f7f7"/>
+        <rect x="120" y="12" width="40" height="5" rx="2.5" fill="#e0e0e0"/>
+        <!-- Story cards -->
+        <rect x="60" y="50" width="60" height="90" rx="6" fill="#e0e0e0" stroke="#ccc" stroke-width="1" opacity="0.5"/>
+        <rect x="110" y="45" width="60" height="100" rx="6" fill="#0078d4" opacity="0.15" stroke="#0078d4" stroke-width="1.5"/>
+        <rect x="160" y="50" width="60" height="90" rx="6" fill="#e0e0e0" stroke="#ccc" stroke-width="1" opacity="0.5"/>
+        <!-- Snap indicator -->
+        <line x1="140" y1="150" x2="140" y2="158" stroke="#0078d4" stroke-width="2" stroke-linecap="round"/>
+        <!-- Dots -->
+        <circle cx="128" cy="162" r="3" fill="#ccc"/>
+        <circle cx="140" cy="162" r="3" fill="#0078d4"/>
+        <circle cx="152" cy="162" r="3" fill="#ccc"/>
+        <!-- Swipe arrow -->
+        <line x1="175" y1="95" x2="205" y2="95" stroke="#999" stroke-width="1.5" stroke-linecap="round"/>
+        <polyline points="198,89 205,95 198,101" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Haptic waves -->
+        <path d="M 62 85 Q 54 95 62 105" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 56 79 Q 44 95 56 111" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 218 85 Q 226 95 218 105" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 224 79 Q 236 95 224 111" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 13: Scenario — Drag to snap -->
+<div class="slide">
+  <span class="label">Scenario</span>
+  <h2>Drag-to-snap divider</h2>
+  <div style="display: flex; gap: 48px; align-items: center;">
+    <div style="flex: 1;">
+      <p>CSS can't express distance-threshold logic — imperative API:</p>
+      <pre><code>divider.addEventListener('pointermove', (e) => {
+  const width = e.clientX;
+  if (!snapped && Math.abs(width - SNAP_POINT) < 4) {
+    snapped = true;
+    navigator.playHaptics?.('align', 0.8);
+  } else if (snapped && Math.abs(width - SNAP_POINT) >= 4) {
+    snapped = false;
+  }
+});</code></pre>
+    </div>
+    <div style="flex: 0 0 340px; text-align: center;">
+      <video src="slack-drag-snap-haptics.mp4" autoplay loop muted playsinline style="width: 340px; border-radius: 8px; border: 1px solid #e0e0e0;"></video>
+      <p style="font-size: 14px; color: #888; margin-top: 8px;">Slack desktop (via Electron + NSHapticFeedbackManager)</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 14: Privacy & Security -->
+<div class="slide compact">
+  <h2>Privacy &amp; Security</h2>
+  <div class="two-col">
+    <div>
+      <h3>Privacy</h3>
+      <ul>
+        <li>No device enumeration</li>
+        <li>No effect/capability queries</li>
+        <li>No success signal returned</li>
+        <li>No new media features in v1</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Security</h3>
+      <ul>
+        <li><span class="bold">Activation model</span>
+          <ul>
+            <li>Imperative: sticky user activation</li>
+            <li>Declarative (direct interaction): fires freely</li>
+            <li>Declarative (script-initiated): requires activation</li>
+          </ul>
+        </li>
+        <li><span class="bold">Anti-abuse</span>
+          <ul>
+            <li>No lasting effect — user can navigate away at any time</li>
+            <li>UA may throttle/suppress per-origin</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 15: Future extensions -->
+<div class="slide compact">
+  <h2>Future extensions</h2>
+  <ul>
+    <li><span class="bold">Animation haptics</span> — <code>haptic-effect</code> / <code>haptic-intensity</code> in <code>@keyframes</code> for multi-step choreography</li>
+    <li><span class="bold">Custom effects</span> — developer-defined or platform-specific beyond the four builtins</li>
+    <li><span class="bold"><code>prefers-haptics</code> media feature</span> — coarse user preference signal</li>
+    <li><span class="bold">Trigger phase control</span> — <code>exit</code> / <code>both</code> in addition to enter-only (e.g. haptic on sidebar open <em>and</em> close)</li>
+  </ul>
+  <pre><code>@keyframes bounce-settle {
+  0%   { transform: translateY(-100%); }
+  40%  { haptic-effect: edge;  transform: translateY(0); }
+  100% { haptic-effect: align; haptic-intensity: 0.5;
+         transform: translateY(0); }
+}</code></pre>
+</div>
+
+<!-- Slide 16: Design Decision — Declarative model -->
+<div class="slide compact">
+  <span class="label">Design Decision</span>
+  <h2>Which declarative model?</h2>
+  <div class="model-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    <div class="comparison-box" style="padding: 16px; border-top: 3px solid #0078d4;">
+      <h3>A. Selector-trigger <span class="tag proposed">proposed</span></h3>
+      <pre><code>@haptic-trigger button:active {
+  effect: align;
+}</code></pre>
+      <ul>
+        <li style="color: #107c10;">Broad selector coverage with direct trigger semantics</li>
+        <li style="color: #888;">Requires precise trigger timing &amp; conflict-resolution rules</li>
+      </ul>
+    </div>
+    <div class="comparison-box" style="padding: 16px;">
+      <h3>B. Pseudo-class property</h3>
+      <pre><code>button:active {
+  haptic-feedback: align;
+}</code></pre>
+      <ul>
+        <li style="color: #107c10;">Very simple for <code>:active</code> / <code>:checked</code></li>
+        <li style="color: #888;">Depends on pseudo-class categorization</li>
+        <li style="color: #888;">Does not cover class/attribute-driven app state</li>
+      </ul>
+    </div>
+    <div class="comparison-box" style="padding: 16px;">
+      <h3>C. Transition-coupled</h3>
+      <pre><code>.btn { transition: scale 0ms;
+       transition-haptic-effect: align; }
+.btn:active { scale: 1; }</code></pre>
+      <ul>
+        <li style="color: #107c10;">Reuses established <code>transition-*</code> pattern</li>
+        <li style="color: #888;">Couples haptics to visual transitions; requires synthetic transitions for non-animated interactions</li>
+      </ul>
+    </div>
+    <div class="comparison-box" style="padding: 16px;">
+      <h3>D. Animation-trigger</h3>
+      <pre><code>@haptic tap { effect: align; }
+button:active {
+  haptic-name: tap;
+}</code></pre>
+      <ul>
+        <li style="color: #107c10;">Strong precedent; reusable named effects</li>
+        <li style="color: #888;">Re-trigger behavior can be less direct; may need value choreography</li>
+      </ul>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top: 12px; padding: 14px 18px;">
+    <p style="font-size: 18px;"><span class="bold">Q:</span> Should selector-trigger (A) or animation-trigger (D) anchor standardization?</p>
+  </div>
+</div>
+
+<!-- Slide 17: Design Decision — Activation model -->
+<div class="slide">
+  <span class="label">Design Decision</span>
+  <h2>Activation model: split or uniform?</h2>
+  <table>
+    <tr><th>Trigger source</th><th>Current proposal</th></tr>
+    <tr>
+      <td>Direct user interaction<br><span class="dim">(e.g. user clicks button → :active matches)</span></td>
+      <td>No extra activation needed</td>
+    </tr>
+    <tr>
+      <td>Script-initiated state change<br><span class="dim">(e.g. JS adds class → selector matches)</span></td>
+      <td>Requires sticky user activation</td>
+    </tr>
+  </table>
+  <div class="highlight-box" style="margin-top: 24px;">
+    <p><span class="bold">Q:</span> Should all declarative triggers be uniformly activation-gated instead?</p>
+  </div>
+</div>
+
+<!-- Slide 18: Quick-fire questions -->
+<div class="slide q-slide compact">
+  <span class="label">Quick-fire Questions</span>
+  <h2>More to discuss</h2>
+  <ul>
+    <li><span class="bold">Effect vocabulary</span><br>
+      <span class="dim">Are <code>hint</code>, <code>edge</code>, <code>tick</code>, <code>align</code> the right four? Do they map well to native primitives?</span></li>
+    <li><span class="bold">Should <code>playHaptics</code> return success?</span><br>
+      <span class="dim">Useful for debugging — but risks leaking hardware info</span></li>
+    <li><span class="bold"><code>:snapped</code> dependency</span><br>
+      <span class="dim">Acceptable for v1, or need a <code>scroll-snap-haptic</code> fallback property?</span></li>
+    <li><span class="bold">Promote any future extension to v1?</span><br>
+      <span class="dim">Animation haptics? Custom effects?</span></li>
+    <li><span class="bold">Global arbitration</span><br>
+      <span class="dim">Standardize cross-element winner beyond per-element dedupe?</span></li>
+  </ul>
+</div>
+
+<!-- Slide 19: Thank you -->
+<div class="slide title-slide">
+  <h1>Thank you</h1>
+  <div class="subtitle" style="margin-bottom: 32px;">Let's discuss!</div>
+  <div class="meta">Explainer: github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/Haptics/explainer.md</div>
+  <div class="meta">Incubation: WICG · CSS WG · Device &amp; Sensors WG</div>
+  <div class="meta" style="margin-top: 24px;">Limin Zhu · Microsoft Edge</div>
+</div>
+
+<!-- Appendix: Platform mappings -->
+<div class="slide">
+  <span class="label">Appendix</span>
+  <h2>Example platform mappings</h2>
+  <p class="dim" style="font-size: 18px;">Illustrative — user agents may choose different mappings.</p>
+  <table>
+    <tr><th>Web</th><th>Windows</th><th>macOS</th><th>iOS</th><th>Android</th></tr>
+    <tr>
+      <td><code>hint</code></td><td>hover</td><td>generic</td><td>light impact</td><td>gesture_threshold_deactivate</td>
+    </tr>
+    <tr>
+      <td><code>edge</code></td><td>collide</td><td>generic</td><td>soft impact</td><td>long_press</td>
+    </tr>
+    <tr>
+      <td><code>tick</code></td><td>step</td><td>generic</td><td>selection</td><td>segment_frequent_tick</td>
+    </tr>
+    <tr>
+      <td><code>align</code></td><td>align</td><td>alignment</td><td>rigid impact</td><td>segment_tick</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Appendix: JS alternatives -->
+<div class="slide">
+  <span class="label">Appendix</span>
+  <h2>JavaScript alternatives considered</h2>
+  <ul>
+    <li><span class="bold">Extending <code>navigator.vibrate()</code></span> — bolting semantic effects onto a pattern-based API is awkward; feature detection breaks; carries abuse stigma</li>
+    <li><span class="bold">Pointer-event based API</span> (our earlier proposal) — purely imperative, no declarative path, ties haptics to specific input events</li>
+    <li><span class="bold">HTML attributes</span> — requires one attribute per interaction type, can't compose with cascade or media queries</li>
+  </ul>
+</div>
+
+<div class="slide-number"><span id="current">1</span> / <span id="total"></span></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  document.getElementById('total').textContent = total;
+
+  function show(n) {
+    slides[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    document.getElementById('current').textContent = current + 1;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault();
+      show(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault();
+      show(current - 1);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      show(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      show(total - 1);
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.clientX > window.innerWidth / 2) {
+      show(current + 1);
+    } else {
+      show(current - 1);
+    }
+  });
+</script>
+
+</body>
+</html>
