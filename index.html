@@ -12,6 +12,14 @@
     background: #fff;
     color: #1a1a1a;
     overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    cursor: none;
+  }
+
+  body.cursor-visible {
+    cursor: default;
   }
 
   .slide {
@@ -46,14 +54,14 @@
 
   .slide.title-slide .subtitle {
     font-size: 24px;
-    color: #555;
+    color: #444;
     font-weight: 400;
     margin-bottom: 12px;
   }
 
   .slide.title-slide .meta {
     font-size: 18px;
-    color: #888;
+    color: #666;
     font-weight: 400;
   }
 
@@ -71,7 +79,7 @@
 
   .slide.section-slide p {
     font-size: 24px;
-    color: #555;
+    color: #444;
     max-width: 700px;
     line-height: 1.5;
   }
@@ -100,27 +108,27 @@
     font-size: 22px;
     line-height: 1.6;
     margin-bottom: 8px;
-    color: #333;
+    color: #222;
   }
 
   p {
     font-size: 22px;
     line-height: 1.6;
-    color: #333;
+    color: #222;
     margin-bottom: 16px;
   }
 
   code {
     font-family: 'Cascadia Code', 'Consolas', 'Fira Code', monospace;
-    background: #f4f4f4;
+    background: #eaeaea;
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 0.9em;
   }
 
   pre {
-    background: #f7f7f7;
-    border-left: 3px solid #0078d4;
+    background: #f0f0f0;
+    border-left: 4px solid #0078d4;
     padding: 24px 28px;
     border-radius: 4px;
     margin-bottom: 20px;
@@ -152,7 +160,7 @@
   td {
     padding: 10px 16px;
     border-bottom: 1px solid #e0e0e0;
-    color: #333;
+    color: #222;
   }
 
   tr:last-child td { border-bottom: none; }
@@ -165,8 +173,8 @@
   }
 
   .diagram {
-    background: #f7f7f7;
-    border: 1px solid #e0e0e0;
+    background: #efefef;
+    border: 1px solid #d0d0d0;
     border-radius: 8px;
     padding: 32px;
     text-align: center;
@@ -193,7 +201,7 @@
     bottom: 24px;
     right: 36px;
     font-size: 14px;
-    color: #bbb;
+    color: #aaa;
     font-variant-numeric: tabular-nums;
   }
 
@@ -217,7 +225,7 @@
     line-height: 1.5;
   }
 
-  .dim { color: #999; }
+  .dim { color: #666; }
   .bold { font-weight: 600; color: #1a1a1a; }
   .blue { color: #0078d4; }
 
@@ -229,7 +237,7 @@
   }
 
   .comparison-box {
-    background: #f7f7f7;
+    background: #f0f0f0;
     border-radius: 8px;
     padding: 24px;
   }
@@ -279,19 +287,19 @@
     border-left-width: 2px;
   }
   .model-grid pre code {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.4;
   }
   .model-grid li {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.45;
     margin-bottom: 3px;
   }
   .model-grid code {
-    font-size: 13px;
+    font-size: 15px;
   }
   .model-grid h3 {
-    font-size: 15px;
+    font-size: 18px;
     margin-top: 0;
     margin-bottom: 10px;
   }
@@ -306,9 +314,10 @@
 <!-- Slide 1: Title -->
 <div class="slide title-slide active">
   <h1>Feel the Web</h1>
-  <div class="subtitle">A Haptics API for the Web Platform</div>
+  <div class="subtitle">Haptics API for the Web Platform</div>
   <div class="meta">Limin Zhu · Microsoft Edge</div>
   <div class="meta">BlinkOn 21 · April 2026</div>
+  <div class="meta" style="margin-top: 20px; font-size: 16px; color: #0078d4;">aka.ms/webhaptics</div>
 </div>
 
 <!-- Slide 2: Audience poll -->
@@ -575,11 +584,11 @@
 <!-- Slide 12: Scenario — Scroll snap -->
 <div class="slide">
   <span class="label">Scenario</span>
-  <h2>Scroll-snap story carousel</h2>
+  <h2>Flipping through albums</h2>
   <div style="display: flex; gap: 48px; align-items: center;">
     <div style="flex: 1;">
-      <p>A tick on each snap landing using <code>:snapped</code> from CSS Scroll Snap 2:</p>
-      <pre><code>@haptic-trigger .story-carousel > .story:snapped {
+      <p>A tick each time an album snaps into view, using <code>:snapped</code> from CSS Scroll Snap 2:</p>
+      <pre><code>@haptic-trigger .album-carousel > .album:snapped {
   effect: tick;
   intensity: 0.5;
 }</code></pre>
@@ -590,24 +599,27 @@
         <rect x="70" y="5" width="140" height="190" rx="18" stroke="#1a1a1a" stroke-width="2.5" fill="#fff"/>
         <rect x="80" y="30" width="120" height="140" rx="3" fill="#f7f7f7"/>
         <rect x="120" y="12" width="40" height="5" rx="2.5" fill="#e0e0e0"/>
-        <!-- Story cards -->
-        <rect x="60" y="50" width="60" height="90" rx="6" fill="#e0e0e0" stroke="#ccc" stroke-width="1" opacity="0.5"/>
-        <rect x="110" y="45" width="60" height="100" rx="6" fill="#0078d4" opacity="0.15" stroke="#0078d4" stroke-width="1.5"/>
-        <rect x="160" y="50" width="60" height="90" rx="6" fill="#e0e0e0" stroke="#ccc" stroke-width="1" opacity="0.5"/>
-        <!-- Snap indicator -->
-        <line x1="140" y1="150" x2="140" y2="158" stroke="#0078d4" stroke-width="2" stroke-linecap="round"/>
+        <!-- Album covers -->
+        <rect x="58" y="50" width="60" height="60" rx="6" fill="#e0e0e0" stroke="#ccc" stroke-width="1" opacity="0.5"/>
+        <rect x="110" y="44" width="60" height="60" rx="6" fill="#0078d4" opacity="0.15" stroke="#0078d4" stroke-width="1.5"/>
+        <!-- Music note on center album -->
+        <text x="140" y="80" font-family="Segoe UI, sans-serif" font-size="22" fill="#0078d4" text-anchor="middle">♪</text>
+        <rect x="162" y="50" width="60" height="60" rx="6" fill="#e0e0e0" stroke="#ccc" stroke-width="1" opacity="0.5"/>
+        <!-- Album title lines -->
+        <rect x="118" y="112" width="44" height="5" rx="2" fill="#999"/>
+        <rect x="124" y="122" width="32" height="4" rx="2" fill="#ccc"/>
         <!-- Dots -->
-        <circle cx="128" cy="162" r="3" fill="#ccc"/>
-        <circle cx="140" cy="162" r="3" fill="#0078d4"/>
-        <circle cx="152" cy="162" r="3" fill="#ccc"/>
+        <circle cx="128" cy="145" r="3" fill="#ccc"/>
+        <circle cx="140" cy="145" r="3" fill="#0078d4"/>
+        <circle cx="152" cy="145" r="3" fill="#ccc"/>
         <!-- Swipe arrow -->
-        <line x1="175" y1="95" x2="205" y2="95" stroke="#999" stroke-width="1.5" stroke-linecap="round"/>
-        <polyline points="198,89 205,95 198,101" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="175" y1="74" x2="205" y2="74" stroke="#999" stroke-width="1.5" stroke-linecap="round"/>
+        <polyline points="198,68 205,74 198,80" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         <!-- Haptic waves -->
-        <path d="M 62 85 Q 54 95 62 105" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <path d="M 56 79 Q 44 95 56 111" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <path d="M 218 85 Q 226 95 218 105" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <path d="M 224 79 Q 236 95 224 111" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 62 75 Q 54 85 62 95" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 56 69 Q 44 85 56 101" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 218 75 Q 226 85 218 95" stroke="#999" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M 224 69 Q 236 85 224 101" stroke="#ccc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
       </svg>
     </div>
   </div>
@@ -699,8 +711,8 @@
   effect: align;
 }</code></pre>
       <ul>
-        <li style="color: #107c10;">Broad selector coverage with direct trigger semantics</li>
-        <li style="color: #888;">Requires precise trigger timing &amp; conflict-resolution rules</li>
+        <li style="color: #107c10;">Covers pseudo-classes, classes, and attributes — handles any app state</li>
+        <li style="color: #666;">New spec concept; no CSS precedent for selector-match-as-trigger</li>
       </ul>
     </div>
     <div class="comparison-box" style="padding: 16px;">
@@ -709,9 +721,8 @@
   haptic-feedback: align;
 }</code></pre>
       <ul>
-        <li style="color: #107c10;">Very simple for <code>:active</code> / <code>:checked</code></li>
-        <li style="color: #888;">Depends on pseudo-class categorization</li>
-        <li style="color: #888;">Does not cover class/attribute-driven app state</li>
+        <li style="color: #107c10;">Simplest syntax for built-in interactions</li>
+        <li style="color: #666;">Cannot fire on class/attribute changes — misses most JS-driven app state</li>
       </ul>
     </div>
     <div class="comparison-box" style="padding: 16px;">
@@ -720,8 +731,8 @@
        transition-haptic-effect: align; }
 .btn:active { scale: 1; }</code></pre>
       <ul>
-        <li style="color: #107c10;">Reuses established <code>transition-*</code> pattern</li>
-        <li style="color: #888;">Couples haptics to visual transitions; requires synthetic transitions for non-animated interactions</li>
+        <li style="color: #107c10;">Familiar <code>transition-*</code> pattern; natural bidirectional firing</li>
+        <li style="color: #666;">Non-animated interactions (e.g. button tap) need fake zero-duration transitions</li>
       </ul>
     </div>
     <div class="comparison-box" style="padding: 16px;">
@@ -731,41 +742,23 @@ button:active {
   haptic-name: tap;
 }</code></pre>
       <ul>
-        <li style="color: #107c10;">Strong precedent; reusable named effects</li>
-        <li style="color: #888;">Re-trigger behavior can be less direct; may need value choreography</li>
+        <li style="color: #107c10;"><code>@keyframes</code>-like pattern; reusable named effects</li>
+        <li style="color: #666;">Repeated same-action (e.g. two taps) needs value reset to re-trigger</li>
       </ul>
     </div>
   </div>
   <div class="highlight-box" style="margin-top: 12px; padding: 14px 18px;">
-    <p style="font-size: 18px;"><span class="bold">Q:</span> Should selector-trigger (A) or animation-trigger (D) anchor standardization?</p>
+    <p style="font-size: 18px;"><span class="bold">Q:</span> Should selector-trigger (A) anchor standardization, or is another model a better fit?</p>
   </div>
 </div>
 
-<!-- Slide 17: Design Decision — Activation model -->
-<div class="slide">
-  <span class="label">Design Decision</span>
-  <h2>Activation model: split or uniform?</h2>
-  <table>
-    <tr><th>Trigger source</th><th>Current proposal</th></tr>
-    <tr>
-      <td>Direct user interaction<br><span class="dim">(e.g. user clicks button → :active matches)</span></td>
-      <td>No extra activation needed</td>
-    </tr>
-    <tr>
-      <td>Script-initiated state change<br><span class="dim">(e.g. JS adds class → selector matches)</span></td>
-      <td>Requires sticky user activation</td>
-    </tr>
-  </table>
-  <div class="highlight-box" style="margin-top: 24px;">
-    <p><span class="bold">Q:</span> Should all declarative triggers be uniformly activation-gated instead?</p>
-  </div>
-</div>
-
-<!-- Slide 18: Quick-fire questions -->
+<!-- Slide 17: Quick-fire questions -->
 <div class="slide q-slide compact">
   <span class="label">Quick-fire Questions</span>
   <h2>More to discuss</h2>
   <ul>
+    <li><span class="bold">Activation model: split or uniform?</span><br>
+      <span class="dim">Direct interaction fires freely; script-initiated requires sticky activation — or gate everything uniformly?</span></li>
     <li><span class="bold">Effect vocabulary</span><br>
       <span class="dim">Are <code>hint</code>, <code>edge</code>, <code>tick</code>, <code>align</code> the right four? Do they map well to native primitives?</span></li>
     <li><span class="bold">Should <code>playHaptics</code> return success?</span><br>
@@ -773,18 +766,21 @@ button:active {
     <li><span class="bold"><code>:snapped</code> dependency</span><br>
       <span class="dim">Acceptable for v1, or need a <code>scroll-snap-haptic</code> fallback property?</span></li>
     <li><span class="bold">Promote any future extension to v1?</span><br>
-      <span class="dim">Animation haptics? Custom effects?</span></li>
+      <span class="dim">Animation haptics? Custom effects? <code>prefers-haptics</code> media feature?</span></li>
     <li><span class="bold">Global arbitration</span><br>
       <span class="dim">Standardize cross-element winner beyond per-element dedupe?</span></li>
+    <li><span class="bold">Device enumeration interest?</span><br>
+      <span class="dim">Richer experiences vs. fingerprinting trade-off — worth exploring?</span></li>
   </ul>
 </div>
 
 <!-- Slide 19: Thank you -->
 <div class="slide title-slide">
   <h1>Thank you</h1>
-  <div class="subtitle" style="margin-bottom: 32px;">Let's discuss!</div>
-  <div class="meta">Explainer: github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/Haptics/explainer.md</div>
-  <div class="meta">Incubation: WICG · CSS WG · Device &amp; Sensors WG</div>
+  <div class="subtitle" style="margin-bottom: 32px;">Read the explainer &amp; leave feedback!</div>
+  <div class="meta" style="font-size: 20px; color: #0078d4; margin-bottom: 8px;">aka.ms/webhaptics</div>
+  <div class="meta">File issues · comment on open questions · share use cases</div>
+  <div class="meta" style="margin-top: 20px;">Incubation: WICG · CSS WG · Device &amp; Sensors WG</div>
   <div class="meta" style="margin-top: 24px;">Limin Zhu · Microsoft Edge</div>
 </div>
 
@@ -860,6 +856,18 @@ button:active {
       show(current - 1);
     }
   });
+
+  // Hide cursor after 2s of inactivity
+  let cursorTimer;
+  function showCursor() {
+    document.body.classList.add('cursor-visible');
+    clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(() => {
+      document.body.classList.remove('cursor-visible');
+    }, 2000);
+  }
+  document.addEventListener('mousemove', showCursor);
+  document.addEventListener('mousedown', showCursor);
 </script>
 
 </body>
