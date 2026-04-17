@@ -472,11 +472,10 @@
   <div class="comparison-row" style="margin-top: 28px;">
     <div class="comparison-box">
       <h3>Declarative (CSS)</h3>
-      <pre><code>@haptic-trigger button:active {
-  effect: align;
-  intensity: 0.8;
+      <pre><code>button:active {
+  @haptic align 0.8;
 }</code></pre>
-      <p style="font-size: 18px; color: #555;">Fires when a selector starts matching.<br>No JavaScript needed.</p>
+      <p style="font-size: 18px; color: #555;">Nested at-rule fires when parent selector starts matching.<br>No JavaScript needed.</p>
     </div>
     <div class="comparison-box">
       <h3>Imperative (JS)</h3>
@@ -530,16 +529,16 @@
 <!-- Slide 11: Declarative API -->
 <div class="slide">
   <h2>Declarative API (CSS)</h2>
-  <pre><code>@haptic-trigger &lt;selector&gt; {
-  effect: &lt;effect-name&gt;;
-  intensity: &lt;number&gt;;       /* optional, defaults to 1.0 */
+  <pre><code>&lt;selector&gt; {
+  /* visual declarations */
+  @haptic &lt;effect-name&gt; &lt;intensity&gt;?;
 }</code></pre>
   <ul>
-    <li>Fires <span class="bold">once</span> when selector <span class="bold">starts matching</span></li>
-    <li>Works with pseudo-classes (<code>:active</code>, <code>:checked</code>, <code>:snapped</code>), classes (<code>.is-open</code>), attributes (<code>[aria-invalid]</code>)</li>
-    <li>Overlapping selectors on same element: highest <span class="bold">specificity</span> wins, one haptic per element per frame</li>
-    <li>UAs may coalesce or suppress triggers to avoid overload</li>
-    <li>Progressive enhancement — browsers silently ignore unknown at-rules</li>
+    <li>Fires <span class="bold">once</span> when parent selector <span class="bold">starts matching</span> — not on initial style computation</li>
+    <li>Works with any selector — pseudo-classes, classes, attributes</li>
+    <li><span class="bold">Per-rule tracking</span> — two rules with the same effect both fire independently, no same-value collision</li>
+    <li>Same-element dedup: highest <span class="bold">specificity</span> wins — at most one haptic per element per frame</li>
+    <li>Script-initiated matches (e.g. <code>classList.add()</code>) require <span class="bold">sticky user activation</span></li>
   </ul>
 </div>
 
@@ -550,9 +549,9 @@
   <div style="display: flex; gap: 48px; align-items: center;">
     <div style="flex: 1;">
       <p>Tactile confirmation on button press — zero JavaScript:</p>
-      <pre><code>@haptic-trigger .add-to-cart:active {
-  effect: align;
-  intensity: 0.8;
+      <pre><code>.add-to-cart:active {
+  scale: 0.95;
+  @haptic align 0.8;
 }</code></pre>
     </div>
     <div style="flex: 0 0 340px; text-align: center;">
@@ -580,16 +579,15 @@
   </div>
 </div>
 
-<!-- Slide 13: Scenario — Flipping through albums -->
+<!-- Slide 13: Scenario — Photo Carousel -->
 <div class="slide">
   <span class="label">Scenario</span>
-  <h2>Flipping through albums</h2>
+  <h2>Photo Carousel</h2>
   <div style="display: flex; gap: 48px; align-items: center;">
     <div style="flex: 1;">
-      <p>A tick each time an album snaps into view, using <code>:snapped</code> from CSS Scroll Snap 2:</p>
-      <pre><code>@haptic-trigger .album-carousel > .album:snapped {
-  effect: tick;
-  intensity: 0.5;
+      <p>A tick each time a photo snaps into view, using <code>:snapped</code> from CSS Scroll Snap 2:</p>
+      <pre><code>.carousel > .photo:snapped {
+  @haptic tick 0.5;
 }</code></pre>
     </div>
     <div style="flex: 0 0 340px; text-align: center;">
@@ -598,13 +596,14 @@
         <rect x="70" y="5" width="140" height="190" rx="18" stroke="#1a1a1a" stroke-width="2.5" fill="#fff"/>
         <rect x="80" y="30" width="120" height="140" rx="3" fill="#f7f7f7"/>
         <rect x="120" y="12" width="40" height="5" rx="2.5" fill="#e0e0e0"/>
-        <!-- Album covers -->
+        <!-- Photo cards -->
         <rect x="58" y="50" width="60" height="60" rx="6" fill="#e0e0e0" stroke="#ccc" stroke-width="1" opacity="0.5"/>
         <rect x="110" y="44" width="60" height="60" rx="6" fill="#0078d4" opacity="0.15" stroke="#0078d4" stroke-width="1.5"/>
-        <!-- Music note on center album -->
-        <text x="140" y="80" font-family="Segoe UI, sans-serif" font-size="22" fill="#0078d4" text-anchor="middle">♪</text>
+        <!-- Mountain/landscape icon on center photo -->
+        <polygon points="125,80 140,62 155,80" fill="#0078d4" opacity="0.4"/>
+        <circle cx="150" cy="58" r="4" fill="#0078d4" opacity="0.3"/>
         <rect x="162" y="50" width="60" height="60" rx="6" fill="#e0e0e0" stroke="#ccc" stroke-width="1" opacity="0.5"/>
-        <!-- Album title lines -->
+        <!-- Photo title lines -->
         <rect x="118" y="112" width="44" height="5" rx="2" fill="#999"/>
         <rect x="124" y="122" width="32" height="4" rx="2" fill="#ccc"/>
         <!-- Dots -->
@@ -717,61 +716,76 @@
         <li>TAG review</li>
         <li>CSS WG design discussion</li>
         <li>Device &amp; Sensors WG discussion</li>
+        <li>Haptic Industry Forum cross-share</li>
         <li>I2P</li>
       </ul>
     </div>
   </div>
 </div>
 
-<!-- Slide 18: Design Decision — Declarative model -->
+<!-- Slide 18: Design Decision — Declarative models -->
 <div class="slide compact">
   <span class="label">Design Decision</span>
   <h2>Which declarative model?</h2>
-  <div class="model-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-    <div class="comparison-box" style="padding: 16px; border-top: 3px solid #0078d4;">
-      <h3>A. Selector-trigger <span class="tag proposed">proposed</span></h3>
-      <pre><code>@haptic-trigger button:active {
-  effect: align;
-}</code></pre>
-      <ul>
-        <li style="color: #107c10;">Covers pseudo-classes, classes, and attributes — handles any app state</li>
-        <li style="color: #666;">New spec concept; no CSS precedent for selector-match-as-trigger</li>
-      </ul>
-    </div>
-    <div class="comparison-box" style="padding: 16px;">
-      <h3>B. Pseudo-class property</h3>
-      <pre><code>button:active {
-  haptic-feedback: align;
-}</code></pre>
-      <ul>
-        <li style="color: #107c10;">Simplest syntax for built-in interactions</li>
-        <li style="color: #666;">Cannot fire on class/attribute changes — misses most JS-driven app state</li>
-      </ul>
-    </div>
-    <div class="comparison-box" style="padding: 16px;">
-      <h3>C. Transition-coupled</h3>
-      <pre><code>.btn { transition: scale 0ms;
-       transition-haptic-effect: align; }
-.btn:active { scale: 1; }</code></pre>
-      <ul>
-        <li style="color: #107c10;">Familiar <code>transition-*</code> pattern; natural bidirectional firing</li>
-        <li style="color: #666;">Non-animated interactions (e.g. button tap) need fake zero-duration transitions</li>
-      </ul>
-    </div>
-    <div class="comparison-box" style="padding: 16px;">
-      <h3>D. Animation-trigger</h3>
-      <pre><code>@haptic tap { effect: align; }
-button:active {
-  haptic-name: tap;
-}</code></pre>
-      <ul>
-        <li style="color: #107c10;"><code>@keyframes</code>-like pattern; reusable named effects</li>
-        <li style="color: #666;">Repeated same-action (e.g. two taps) needs value reset to re-trigger</li>
-      </ul>
-    </div>
-  </div>
-  <div class="highlight-box" style="margin-top: 12px; padding: 14px 18px;">
-    <p style="font-size: 18px;"><span class="bold">Q:</span> Should selector-trigger (A) anchor standardization, or is another model a better fit?</p>
+  <p style="font-size: 17px; color: #444; margin-bottom: 12px;">Haptics are <span class="bold">one-shot, fire-and-forget</span> — not ongoing state. We evaluated five models:</p>
+  <table style="font-size: 15px; line-height: 1.35;">
+    <tr>
+      <th style="width: 13%;">Model</th>
+      <th style="width: 35%;">Syntax</th>
+      <th style="text-align: center;">Syntax–semantics match</th>
+      <th style="text-align: center;">Co-located</th>
+      <th style="text-align: center;">Concise</th>
+      <th style="text-align: center;">Re-trigger safe</th>
+    </tr>
+    <tr style="background: #f0f6ff;">
+      <td><span class="bold">A.</span> Nested <code>@haptic</code> <span class="tag proposed" style="font-size: 11px;">proposed</span></td>
+      <td><code style="font-size: 14px;">button:active { scale: .95; <span class="bold">@haptic align;</span> }</code></td>
+      <td style="text-align: center;">✅ says "haptic"</td>
+      <td style="text-align: center;">✅</td>
+      <td style="text-align: center;">✅</td>
+      <td style="text-align: center;">✅ per-rule tracking</td>
+    </tr>
+    <tr>
+      <td><span class="bold">B.</span> Standalone <code>@haptic-trigger</code></td>
+      <td><code style="font-size: 14px;">@haptic-trigger button:active { effect: align; }</code></td>
+      <td style="text-align: center;">✅ says "haptic"</td>
+      <td style="text-align: center;">❌ separate block</td>
+      <td style="text-align: center;">❌ two blocks</td>
+      <td style="text-align: center;">✅ per-rule tracking</td>
+    </tr>
+    <tr>
+      <td><span class="bold">C.</span> Computed-value property</td>
+      <td><code style="font-size: 14px;">button:active { haptic-feedback: align; }</code></td>
+      <td style="text-align: center;">❌ looks like state</td>
+      <td style="text-align: center;">✅</td>
+      <td style="text-align: center;">✅</td>
+      <td style="text-align: center;">❌ value collision</td>
+    </tr>
+    <tr>
+      <td><span class="bold">D.</span> Animation-trigger</td>
+      <td><code style="font-size: 14px;">@haptic tap { effect: align; }<br>button:active { haptic-name: tap; }</code></td>
+      <td style="text-align: center;">❌ looks like state</td>
+      <td style="text-align: center;">⚠️ split</td>
+      <td style="text-align: center;">❌ define+attach</td>
+      <td style="text-align: center;">⚠️ unique names</td>
+    </tr>
+    <tr>
+      <td><span class="bold">E.</span> Transition-coupled</td>
+      <td><code style="font-size: 14px;">.btn { transition: scale 0ms;<br>&nbsp;&nbsp;transition-haptic-effect: align; }</code></td>
+      <td style="text-align: center;">⚠️ natural with transition</td>
+      <td style="text-align: center;">✅</td>
+      <td style="text-align: center;">❌ needs fake transition</td>
+      <td style="text-align: center;">⚠️ dummy props</td>
+    </tr>
+  </table>
+  <p style="font-size: 14px; color: #666; margin-top: 6px; margin-bottom: 0;">
+    <span class="bold">Syntax–semantics match</span> = dev sees syntax, matches intuition &nbsp;·&nbsp;
+    <span class="bold">Co-located</span> = haptic in same rule block &nbsp;·&nbsp;
+    <span class="bold">Concise</span> = minimal syntax &nbsp;·&nbsp;
+    <span class="bold">Re-trigger safe</span> = same effect fires from distinct state changes
+  </p>
+  <div class="highlight-box" style="margin-top: 10px; padding: 12px 18px;">
+    <p style="font-size: 18px; margin-bottom: 0;"><span class="bold">Q:</span> Which tradeoffs best serve developers? Should nested <code>@haptic</code> anchor standardization?</p>
   </div>
 </div>
 
@@ -781,6 +795,8 @@ button:active {
   <h2>Seeds for discussion</h2>
   <p style="font-size: 18px; color: #444; margin-bottom: 20px;">These are open questions in the explainer — happy to dive into any of these or wherever the conversation goes.</p>
   <ul>
+    <li><span class="bold">Which declarative model?</span><br>
+      <span class="dim">Nested <code>@haptic</code> (primary) vs. standalone <code>@haptic-trigger</code>, computed-value property, animation-trigger, transition-coupled</span></li>
     <li><span class="bold">Activation model: split or uniform?</span><br>
       <span class="dim">Direct interaction fires freely; script-initiated requires sticky activation — or gate everything uniformly?</span></li>
     <li><span class="bold">Should <code>playHaptics</code> return success?</span><br>
