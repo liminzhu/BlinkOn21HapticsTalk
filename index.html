@@ -317,7 +317,7 @@
   <div class="subtitle">Haptics API for the Web Platform</div>
   <div class="meta">Limin Zhu · Microsoft Edge</div>
   <div class="meta">BlinkOn 21 · April 2026</div>
-  <div class="meta" style="margin-top: 20px; font-size: 16px; color: #0078d4;">aka.ms/webhaptics</div>
+  <div class="meta" style="margin-top: 20px; font-size: 16px;"><a href="https://aka.ms/webhaptics" style="color: #0078d4; text-decoration: none;">aka.ms/webhaptics</a></div>
 </div>
 
 <!-- Slide 2: Audience poll -->
@@ -564,7 +564,28 @@
   <p><code>intensity</code>: normalized 0.0–1.0 · effective = system setting × developer value</p>
 </div>
 
-<!-- Slide 10: Imperative API -->
+<!-- Slide 10: Platform mappings -->
+<div class="slide">
+  <h2>Example platform mappings</h2>
+  <p class="dim" style="font-size: 18px;">Illustrative — user agents may choose different mappings.</p>
+  <table>
+    <tr><th>Web</th><th>Windows</th><th>macOS</th><th>iOS</th><th>Android</th></tr>
+    <tr>
+      <td><code>hint</code></td><td>hover</td><td>generic</td><td>light impact</td><td>gesture_threshold_deactivate</td>
+    </tr>
+    <tr>
+      <td><code>edge</code></td><td>collide</td><td>generic</td><td>soft impact</td><td>long_press</td>
+    </tr>
+    <tr>
+      <td><code>tick</code></td><td>step</td><td>generic</td><td>selection</td><td>segment_frequent_tick</td>
+    </tr>
+    <tr>
+      <td><code>align</code></td><td>align</td><td>alignment</td><td>rigid impact</td><td>segment_tick</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Slide 11: Imperative API -->
 <div class="slide">
   <h2>Imperative API (JS)</h2>
   <pre><code>navigator.playHaptics(effect, intensity);</code></pre>
@@ -702,7 +723,7 @@
   <span class="label">Deferred from v1</span>
   <h2>Future extensions</h2>
   <ul style="margin-top: 12px;">
-    <li><span class="bold">Custom effects</span> — developer-defined or platform-specific beyond the four builtins</li>
+    <li><span class="bold">Grow effect vocabulary</span> — adding more effects beyond the four builtins</li>
     <li><span class="bold"><code>prefers-haptics</code> media feature</span> — coarse user preference signal</li>
     <li><span class="bold">Trigger phase control</span> — <code>exit</code> / <code>both</code> in addition to enter-only (e.g. haptic on sidebar open <em>and</em> close)</li>
   </ul>
@@ -856,34 +877,12 @@
 <div class="slide title-slide">
   <h1>Thank you</h1>
   <div class="subtitle" style="margin-bottom: 32px;">Read the explainer &amp; leave feedback!</div>
-  <div class="meta" style="font-size: 20px; color: #0078d4; margin-bottom: 8px;">aka.ms/webhaptics</div>
+  <div class="meta" style="font-size: 20px; margin-bottom: 8px;"><a href="https://aka.ms/webhaptics" style="color: #0078d4; text-decoration: none;">aka.ms/webhaptics</a></div>
   <div class="meta">File issues · comment on open questions · share use cases</div>
   <div class="meta" style="margin-top: 24px;">Limin Zhu · Microsoft Edge</div>
 </div>
 
-<!-- Appendix A: Platform mappings -->
-<div class="slide">
-  <span class="label">Appendix</span>
-  <h2>Example platform mappings</h2>
-  <p class="dim" style="font-size: 18px;">Illustrative — user agents may choose different mappings.</p>
-  <table>
-    <tr><th>Web</th><th>Windows</th><th>macOS</th><th>iOS</th><th>Android</th></tr>
-    <tr>
-      <td><code>hint</code></td><td>hover</td><td>generic</td><td>light impact</td><td>gesture_threshold_deactivate</td>
-    </tr>
-    <tr>
-      <td><code>edge</code></td><td>collide</td><td>generic</td><td>soft impact</td><td>long_press</td>
-    </tr>
-    <tr>
-      <td><code>tick</code></td><td>step</td><td>generic</td><td>selection</td><td>segment_frequent_tick</td>
-    </tr>
-    <tr>
-      <td><code>align</code></td><td>align</td><td>alignment</td><td>rigid impact</td><td>segment_tick</td>
-    </tr>
-  </table>
-</div>
-
-<!-- Appendix B: JS alternatives -->
+<!-- Appendix A: JS alternatives -->
 <div class="slide">
   <span class="label">Appendix</span>
   <h2>JavaScript alternatives considered</h2>
