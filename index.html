@@ -508,7 +508,7 @@
       <ul>
         <li>Identical output across platforms</li>
         <li>Notification haptics (e.g. alert on task complete)</li>
-        <li>Gamepad / specialized hardware</li>
+        <li>Gamepad / specialized hardware with existing haptic APIs</li>
       </ul>
     </div>
   </div>
@@ -564,28 +564,7 @@
   <p><code>intensity</code>: normalized 0.0–1.0 · effective = system setting × developer value</p>
 </div>
 
-<!-- Slide 10: Platform mappings -->
-<div class="slide">
-  <h2>Example platform mappings</h2>
-  <p class="dim" style="font-size: 18px;">Illustrative — user agents may choose different mappings.</p>
-  <table>
-    <tr><th>Web</th><th>Windows</th><th>macOS</th><th>iOS</th><th>Android</th></tr>
-    <tr>
-      <td><code>hint</code></td><td>hover</td><td>generic</td><td>light impact</td><td>gesture_threshold_deactivate</td>
-    </tr>
-    <tr>
-      <td><code>edge</code></td><td>collide</td><td>generic</td><td>soft impact</td><td>long_press</td>
-    </tr>
-    <tr>
-      <td><code>tick</code></td><td>step</td><td>generic</td><td>selection</td><td>segment_frequent_tick</td>
-    </tr>
-    <tr>
-      <td><code>align</code></td><td>align</td><td>alignment</td><td>rigid impact</td><td>segment_tick</td>
-    </tr>
-  </table>
-</div>
-
-<!-- Slide 11: Imperative API -->
+<!-- Slide 10: Imperative API -->
 <div class="slide">
   <h2>Imperative API (JS)</h2>
   <pre><code>navigator.playHaptics(effect, intensity);</code></pre>
@@ -606,8 +585,7 @@
 }</code></pre>
   <ul>
     <li>Fires <span class="bold">once</span> when parent selector <span class="bold">starts matching</span> — not on initial style computation</li>
-    <li>Works with any selector — pseudo-classes, classes, attributes</li>
-    <li><span class="bold">Per-rule tracking</span> — two rules with the same effect both fire independently, no same-value collision</li>
+    <li><span class="bold">Per-rule tracking</span> — each <code>@haptic</code> tracks its own parent rule’s selector independently</li>
     <li>Script-initiated matches (e.g. <code>classList.add()</code>) require <span class="bold">sticky user activation</span></li>
     <li>Also nests inside <code>@keyframes</code> for multi-step haptic choreography</li>
   </ul>
@@ -882,7 +860,29 @@
   <div class="meta" style="margin-top: 24px;">Limin Zhu · Microsoft Edge</div>
 </div>
 
-<!-- Appendix A: JS alternatives -->
+<!-- Appendix A: Platform mappings -->
+<div class="slide">
+  <span class="label">Appendix</span>
+  <h2>Example platform mappings</h2>
+  <p class="dim" style="font-size: 18px;">Illustrative — user agents may choose different mappings.</p>
+  <table>
+    <tr><th>Web</th><th>Windows</th><th>macOS</th><th>iOS</th><th>Android</th></tr>
+    <tr>
+      <td><code>hint</code></td><td>hover</td><td>generic</td><td>light impact</td><td>gesture_threshold_deactivate</td>
+    </tr>
+    <tr>
+      <td><code>edge</code></td><td>collide</td><td>generic</td><td>soft impact</td><td>long_press</td>
+    </tr>
+    <tr>
+      <td><code>tick</code></td><td>step</td><td>generic</td><td>selection</td><td>segment_frequent_tick</td>
+    </tr>
+    <tr>
+      <td><code>align</code></td><td>align</td><td>alignment</td><td>rigid impact</td><td>segment_tick</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Appendix B: JS alternatives -->
 <div class="slide">
   <span class="label">Appendix</span>
   <h2>JavaScript alternatives considered</h2>
